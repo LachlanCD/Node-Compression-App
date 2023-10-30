@@ -2,9 +2,7 @@ const express = require('express');
 const { spawn } = require('child_process');
 const multer = require('multer');
 const router = express.Router();
-const fs = require('fs');
-const { Readable } = require('stream');
-const uploadToS3 = require("../S3Functions/s3Upload")
+const { uploadToS3 } = require("../AWSFunctions/s3Functions")
 
 
 // Define a storage engine for multer
@@ -12,7 +10,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 // Handle file upload and compression
-router.post('/upload', upload.single('file'), async (req, res) => {
+router.post('/', upload.single('file'), async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
 
