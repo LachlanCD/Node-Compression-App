@@ -1,36 +1,36 @@
 const express = require('express');
-const { spawn } = require('child_process');
 const multer = require('multer');
 const router = express.Router();
+const { spawn } = require('child_process');
 const { uploadToS3 } = require("../AWSFunctions/s3Functions")
-
 
 // Define a storage engine for multer
 const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const upload = multer({ storage: storage });
 
 // Handle file upload and compression
-router.post('/', upload.single('file'), async (req, res) => {
+router.post('/', upload.array('files'), async (req, res) => {
+    if (!req.files || req.files.length === 0) return res.status(400).json({ message: 'No files uploaded' });
     try {
-        if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
 
-        // Compress the uploaded file using Bzip2
-        const uncompressedBuffer = req.file.buffer;
-        const compressedBuffer = await compressWithBzip2(uncompressedBuffer);
+        const compressedFiles = await Promise.all(
+            req.files.map(async (file, index) => {
+                const compressedBuffer = await compressWithBzip2(file.buffer);
+                const s3Key = `${file.originalname}.bzip2`;
+                await uploadToS3(compressedBuffer, s3Key);
+                return s3Key;
+            })
+        );
 
-        const s3Key = `${req.file.originalname}.bzip2`
-        await uploadToS3(compressedBuffer, s3Key)
-
-        // Return a response to the client
-        res.json({ message: 'File compressed and uploaded to S3' });
-
-
+        // Return a response to the client with the list of S3 keys for the compressed files
+        res.json({ message: 'Files compressed and uploaded to S3', compressedFiles });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: 'Error compressing the file' });
     }
 });
-  
+
+
 // Function to compress a buffer using Bzip2
 async function compressWithBzip2(inputBuffer) {
     return new Promise((resolve, reject) => {
