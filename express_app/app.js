@@ -1,6 +1,10 @@
 const express = require('express');
+const cors = require('cors');
+
 const app = express();
 const port = 3000;
+
+app.use(cors());
 
 const uploadController = require('./routes/upload');
 const downloadController = require('./routes/download');
