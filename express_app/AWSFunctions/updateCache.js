@@ -1,34 +1,39 @@
-const express = require('express');
-const router = express.Router();
-const AWS = require('aws-sdk');
+const Redis = require('ioredis');
 
-// initialise bucket and object variables
-const bucketName = "gr87-storage";
-const objectKey = "counter.json";
-const jsonData = {
-    counter: 0,
-    data: 'test'
-}
+// Initialize the Redis cluster client
+const cluster = new Redis.Cluster([
+  {
+    host: 'group87-redis-cluster.km2jzi.ng.0001.apse2.cache.amazonaws.com',
+    port: 6379
+  }
+]);
 
-export async function getData() {
+// Connection established
+cluster.on('connect', () => {
+  console.log('Connected to Redis Cluster');
+});
 
-}
+// Connection error
+cluster.on('error', (err) => {
+  console.error(`Error: ${err}`);
+});
 
-// function to get current counter from s3 and update local object
-export async function getObjectFromS3() {
-    const params = {
-        Bucket: bucketName,
-        Key: objectKey,
-    };
+// On client closed
+cluster.on('end', () => {
+  console.error('Client closed');
+});
 
-    try {
-        const data = await s3.getObject(params).promise();
-        const parsedData = JSON.parse(data.Body.toString("utf-8"));
-        return parsedData;
-    } catch (err) {
-        // if the object doesnt exist dont throw an error
-        if (err.code !== 'NoSuchKey') throw err;
+// Test set and get
+cluster.set('key', 'value', (err, reply) => {
+  if (err) {
+    return console.error(`Set Error: ${err}`);
+  }
+  console.log(`Set Reply: ${reply}`);
+
+  cluster.get('key', (err, reply) => {
+    if (err) {
+      return console.error(`Get Error: ${err}`);
     }
-}
-
-module.exports = router
+    console.log(`Get Reply: ${reply}`);
+  });
+});
