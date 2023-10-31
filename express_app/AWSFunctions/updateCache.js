@@ -1,34 +1,39 @@
-const express = require('express');
-const router = express.Router();
-const AWS = require('aws-sdk');
+// Importing required libraries and modules
+const Redis = require('ioredis');
 
-// initialise bucket and object variables
-const bucketName = "gr87-storage";
-const objectKey = "counter.json";
-const jsonData = {
-    counter: 0,
-    data: 'test'
-}
+// Your ElastiCache Redis endpoint URL and port
+const redisEndpoint = 'group87-redis-cluster.km2jzi.ng.0001.apse2.cache.amazonaws.com';
+const redisPort = 6379;
 
-export async function getData() {
+// Initialize Redis client
+// Connection string generally has the format: 'redis://username:password@hostname:port'
+const redis = new Redis({
+  host: redisEndpoint,
+  port: redisPort,
+  // Additional options can be added here
+});
 
-}
+// Adding event listeners to handle events
 
-// function to get current counter from s3 and update local object
-export async function getObjectFromS3() {
-    const params = {
-        Bucket: bucketName,
-        Key: objectKey,
-    };
+// Listen for the "connect" event to confirm that the client has connected successfully
+redis.on('connect', () => {
+  console.log('Connected to Redis');
+});
 
-    try {
-        const data = await s3.getObject(params).promise();
-        const parsedData = JSON.parse(data.Body.toString("utf-8"));
-        return parsedData;
-    } catch (err) {
-        // if the object doesnt exist dont throw an error
-        if (err.code !== 'NoSuchKey') throw err;
-    }
-}
+// Listen for the "error" event to catch and display errors
+redis.on('error', (error) => {
+  console.error('Redis error', error);
+});
 
-module.exports = router
+// Sample function to set and get a key-value pair
+const testRedis = async () => {
+  // Set key "foo" to hold the value "bar"
+  await redis.set('foo', 'bar');
+  
+  // Retrieve and log the value of key "foo"
+  const value = await redis.get('foo');
+  console.log(`Value of key foo: ${value}`);
+};
+
+// Execute the sample function
+testRedis().catch(console.error);
