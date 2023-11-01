@@ -7,9 +7,10 @@ const redisPort = 6379;
 const redis = new Redis({
   host: redisEndpoint,
   port: redisPort,
+  connectTimeout: 30000,
 });
 
-// On error, create console error
+// Listen for and display Redis errors
 redis.on('error', (error) => {
   console.error('Redis error', error);
 });
@@ -17,6 +18,7 @@ redis.on('error', (error) => {
 // Function to create new key value pair in Elasticache 
 async function makeNewKeyPair (name, location, fileType) {
   try {
+    checkRedisConnection();
     const curTime = Date.now();
     
     await redis.set(name, `{ location: ${location}, time: ${curTime}, File: ${fileType} }`);
@@ -30,23 +32,27 @@ async function makeNewKeyPair (name, location, fileType) {
 async function getCacheData () {
 
   try {
+    checkRedisConnection();
 
-  const allKeys = await redis.keys('*');
-  
-  const keyValueData = {};
+    const allKeys = await redis.keys('*');
+    const keyValueData = {};
 
-  // Iterate through the keys and fetch their values
-  for (const key of allKeys) {
-    const value = await redis.get(key);
-    keyValueData[key] = value;
-  }
+    // Iterate through the keys and fetch their values
+    for (const key of allKeys) {
+      const value = await redis.get(key);
+      keyValueData[key] = value;
+    }
 
-  return keyValueData
+    return keyValueData
 
   } catch (err) {
     throw err
   }
 };
+
+function checkRedisConnection() {
+  if (redis.status !== 'ready') throw { status: 503, message: 'Redis connection failed' };
+}
 
 module.exports = {getCacheData, makeNewKeyPair};
 

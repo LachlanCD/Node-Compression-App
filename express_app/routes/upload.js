@@ -12,7 +12,7 @@ const upload = multer({ storage: storage });
 // Handle file upload and compression
 router.post('/', upload.array('files'), async (req, res, next) => {
     try {
-        if (!req.files || req.files.length === 0) throw res.status(400).json({ message: 'No files uploaded' });
+        if (!req.files || req.files.length === 0) throw { status: 400, message: 'No files uploaded' };
         const compressedFiles = await Promise.all(
             req.files.map(async (file) => {
 
@@ -20,7 +20,7 @@ router.post('/', upload.array('files'), async (req, res, next) => {
                 const s3Key = `${file.originalname}.bzip2`;
                 await uploadToS3(compressedBuffer, s3Key);
 
-                makeNewKeyPair(file.originalname, s3Key, file.mimetype)
+                await makeNewKeyPair(file.originalname, s3Key, file.mimetype)
 
                 return s3Key;
             })
