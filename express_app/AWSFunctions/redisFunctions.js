@@ -23,7 +23,7 @@ redis.on('error', (error) => {
   console.error('Redis error', error);
 });
 
-async function makeNew (name, location, fileType) {
+async function makeNewKeyPair (name, location, fileType) {
   try {
     const curTime = Date.now();
     
@@ -51,5 +51,5 @@ async function getCacheData () {
   return keyValueData
 };
 
-module.exports = {getCacheData, makeNew};
+module.exports = {getCacheData, makeNewKeyPair};
 
