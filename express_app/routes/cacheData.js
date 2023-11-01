@@ -7,7 +7,7 @@ router.get('/', async (req, res) => {
   try {
     const keyValueData = await getCacheData();
 
-    console.log(keyValueData.test2.object)
+    console.log(keyValueData.test3)
 
     res.status(200).json(keyValueData);
       
