@@ -7,6 +7,8 @@ router.get('/', async (req, res) => {
   try {
     const keyValueData = await getCacheData();
 
+    console.log(keyValueData.test2)
+
     res.status(200).json(keyValueData);
       
   } catch (err) {
