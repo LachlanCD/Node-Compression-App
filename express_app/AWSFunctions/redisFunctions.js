@@ -27,11 +27,7 @@ async function makeNew (name, location, fileType) {
   try {
     const curTime = Date.now();
 
-    await redis.set(name, `{
-      location: ${location},
-      time: ${curTime},
-      File: ${fileType},
-    }`);
+    await redis.set(name, `{ location: ${location}, time: ${curTime}, File: ${fileType} }`);
 
   } catch (error) {
     throw error;
