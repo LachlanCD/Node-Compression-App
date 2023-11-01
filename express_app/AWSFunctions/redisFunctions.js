@@ -21,13 +21,15 @@ async function makeNewKeyPair (name, location, fileType) {
     
     await redis.set(name, `{ location: ${location}, time: ${curTime}, File: ${fileType} }`);
 
-  } catch (error) {
-    throw error;
+  } catch (err) {
+    throw err;
   }
 }
 
 // Function to retrieve all keys and their values from Elasticache
 async function getCacheData () {
+
+  try {
 
   const allKeys = await redis.keys('*');
   
@@ -40,6 +42,10 @@ async function getCacheData () {
   }
 
   return keyValueData
+
+  } catch (err) {
+    throw err
+  }
 };
 
 module.exports = {getCacheData, makeNewKeyPair};
