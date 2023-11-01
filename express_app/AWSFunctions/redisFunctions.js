@@ -13,8 +13,6 @@ const redis = new Redis({
   // Additional options can be added here
 });
 
-// Adding event listeners to handle events
-
 // Listen for the "connect" event to confirm that the client has connected successfully
 redis.on('connect', () => {
   console.log('Connected to Redis');
@@ -25,15 +23,29 @@ redis.on('error', (error) => {
   console.error('Redis error', error);
 });
 
+async function makeNew (name, location, fileType) {
+  try {
+    const curTime = Date.now();
+
+    await redis.set(name, {
+      location: location,
+      time: curTime,
+      File: fileType,
+    });
+
+  } catch (error) {
+    throw error;
+  }
+}
+
 // Sample function to set and get a key-value pair
-const testRedis = async () => {
-  // Set key "foo" to hold the value "bar"
-  await redis.set('foo', 'bar');
-  
+async function getAllKeys () {
   // Retrieve and log the value of key "foo"
-  const value = await redis.get('foo');
-  console.log(`Value of key foo: ${value}`);
+  const value = await redis.keys('*');
+  console.log(`All keys: ${value}`);
+  return value
 };
 
-// Execute the sample function
-testRedis().catch(console.error);
+makeNew(test, test, test);
+
+module.exports = {getAllKeys, makeNew};
