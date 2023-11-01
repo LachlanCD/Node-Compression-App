@@ -54,6 +54,4 @@ async function getCacheData () {
   return keyValueData
 };
 
-makeNew(test, test, test);
-
 module.exports = {getCacheData, makeNew};
