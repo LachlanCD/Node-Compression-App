@@ -26,7 +26,7 @@ redis.on('error', (error) => {
 async function makeNew (name, location, fileType) {
   try {
     const curTime = Date.now();
-
+    
     await redis.set(name, `{ location: ${location}, time: ${curTime}, File: ${fileType} }`);
 
   } catch (error) {
@@ -35,6 +35,7 @@ async function makeNew (name, location, fileType) {
 }
 
 // Sample function to set and get a key-value pair
+
 async function getCacheData () {
   const allKeys = await redis.keys('*');
   
@@ -50,6 +51,5 @@ async function getCacheData () {
   return keyValueData
 };
 
-makeNew('test3', 'test3', 'test3')
-
 module.exports = {getCacheData, makeNew};
+
