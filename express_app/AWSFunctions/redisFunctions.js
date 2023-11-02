@@ -21,7 +21,7 @@ async function makeNewKeyPairRedis (name, location, fileType) {
     checkRedisConnection();
     const curTime = Date.now();
     
-    await redis.set(name, `{ location: ${location}, time: ${curTime}, File: ${fileType} }`);
+    await redis.set(name, `{ location: '${location}', time: ${curTime}, File: '${fileType}' }`);
 
   } catch (err) {
     throw err;
