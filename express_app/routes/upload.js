@@ -16,8 +16,8 @@ router.post('/', upload.array('files'), async (req, res, next) => {
         const compressedFiles = await Promise.all(
             req.files.map(async (file) => {
 
-                const compressedBuffer = await compressWithBzip2(file.buffer);
-                const s3Key = `${file.originalname}.bzip2`;
+                const compressedBuffer = await compressWithXz(file.buffer);
+                const s3Key = `${file.originalname}.xz`;
                 await uploadToS3(compressedBuffer, s3Key);
 
                 await makeNewKeyPairRedis(file.originalname, s3Key, file.mimetype)
@@ -35,24 +35,24 @@ router.post('/', upload.array('files'), async (req, res, next) => {
 
 
 // Function to compress a buffer using Bzip2
-async function compressWithBzip2(inputBuffer) {
+async function compressWithXz(inputBuffer) {
     return new Promise((resolve, reject) => {
-        const bzip2 = spawn('bzip2', ['-c']);
+        const xz = spawn('xz', ['-c']);
 
-        bzip2.stdin.write(inputBuffer);
-        bzip2.stdin.end();
+        xz.stdin.write(inputBuffer);
+        xz.stdin.end();
 
         const compressedData = [];
 
-        bzip2.stdout.on('data', (data) => {
+        xz.stdout.on('data', (data) => {
             compressedData.push(data);
         });
 
-        bzip2.stdout.on('end', () => {
+        xz.stdout.on('end', () => {
             resolve(Buffer.concat(compressedData));
         });
 
-        bzip2.on('error', (err) => {
+        xz.on('error', (err) => {
             reject(err);
         });
     });

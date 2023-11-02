@@ -11,7 +11,6 @@ router.get('/:key', async (req, res, next) => {
         res.setHeader('Content-Disposition', `attachment; filename=${fileData.fileName}`);
         res.setHeader('Content-Type', fileData.contentType);
         res.send(fileData.content);
-        res.status(200).json({ message: `files ${fileKey} successfully downloaded` });
     } catch (err) {
         next(err)
     }
