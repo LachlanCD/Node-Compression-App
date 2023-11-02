@@ -8,12 +8,8 @@ router.get('/:key', async (req, res, next) => {
   const key = req.params.key;
 
   try {
-    console.log(key)
-
     const redisData = await getKeyDataRedis(key);
     const redisDataJSON = JSON.parse(redisData);
-
-    console.log(redisDataJSON)
 
     await deleteObjectS3(redisDataJSON.Location);
     await deleteKeyRedis(key);
