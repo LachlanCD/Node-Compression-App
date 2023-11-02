@@ -4,6 +4,7 @@ const logger = require('morgan');
 const uploadController = require('./routes/upload');
 const downloadController = require('./routes/download');
 const cacheDataController = require('./routes/cacheData');
+const deleteController = require('./routes/deleteData');
 
 const app = express();
 const port = 3000;
@@ -16,6 +17,7 @@ app.use(logger('dev'));
 app.use('/upload', uploadController);
 app.use('/download', downloadController);
 app.use('/getCacheData', cacheDataController);
+app.use('/delete', deleteController);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

@@ -16,12 +16,12 @@ redis.on('error', (error) => {
 });
 
 // Function to create new key value pair in Elasticache 
-async function makeNewKeyPair (name, location, fileType) {
+async function makeNewKeyPairRedis (name, location, fileType) {
   try {
     checkRedisConnection();
     const curTime = Date.now();
     
-    await redis.set(name, `{ location: ${location}, time: ${curTime}, File: ${fileType} }`);
+    await redis.set(name, `{ "location": "${location}", "time": "${curTime}", "File": "${fileType}" }`);
 
   } catch (err) {
     throw err;
@@ -29,8 +29,7 @@ async function makeNewKeyPair (name, location, fileType) {
 }
 
 // Function to retrieve all keys and their values from Elasticache
-async function getCacheData () {
-
+async function getDataRedis () {
   try {
     checkRedisConnection();
 
@@ -50,9 +49,35 @@ async function getCacheData () {
   }
 };
 
+// Function to get value for given key
+async function getKeyDataRedis(key) {
+  try {
+    checkRedisConnection();
+
+    const keyValueData = await redis.get(key);
+    return keyValueData
+
+  } catch (err) {
+    throw err
+  }
+}
+
+// Function to delete a key from redis
+async function deleteKeyRedis(key) {
+  try {
+    checkRedisConnection();
+    const result = await redis.del(key);
+
+    if (result !== 1) throw { status: 404, message: `Key ${key} not found` };
+
+  } catch (err) {
+    throw err
+  }
+}
+
+// Function to test the redis connection
 function checkRedisConnection() {
   if (redis.status !== 'ready') throw { status: 503, message: 'Redis connection failed' };
 }
 
-module.exports = {getCacheData, makeNewKeyPair};
-
+module.exports = {makeNewKeyPairRedis, getDataRedis, getKeyDataRedis, deleteKeyRedis};

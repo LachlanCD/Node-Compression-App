@@ -3,7 +3,7 @@ const multer = require('multer');
 const router = express.Router();
 const { spawn } = require('child_process');
 const { uploadToS3 } = require("../AWSFunctions/s3Functions")
-const { makeNewKeyPair } = require("../AWSFunctions/redisFunctions");
+const { makeNewKeyPairRedis } = require("../AWSFunctions/redisFunctions");
 
 // Define a storage engine for multer
 const storage = multer.memoryStorage();
@@ -20,14 +20,14 @@ router.post('/', upload.array('files'), async (req, res, next) => {
                 const s3Key = `${file.originalname}.bzip2`;
                 await uploadToS3(compressedBuffer, s3Key);
 
-                await makeNewKeyPair(file.originalname, s3Key, file.mimetype)
+                await makeNewKeyPairRedis(file.originalname, s3Key, file.mimetype)
 
                 return s3Key;
             })
         );
 
         // Return a response to the client with the list of S3 keys for the compressed files
-        res.json({ message: 'Files compressed and uploaded to S3', compressedFiles });
+        res.status(200).json({ message: 'Files compressed and uploaded to S3', compressedFiles });
     } catch (err) {
         next(err)
     }
