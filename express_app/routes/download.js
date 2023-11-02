@@ -10,8 +10,9 @@ router.get('/:key', async (req, res, next) => {
         const fileData = await downloadFromS3(fileKey);
         res.setHeader('Content-Disposition', `attachment; filename=${fileData.fileName}`);
         res.setHeader('Content-Type', fileData.contentType);
+        res.status(200)
+        res.json({ message: `files ${fileKey} successfully downloaded` });
         res.send(fileData.content);
-        res.status(200).json({ message: `files ${fileKey} successfully downloaded` });
     } catch (err) {
         next(err)
     }
