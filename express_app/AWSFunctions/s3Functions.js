@@ -51,4 +51,9 @@ async function uploadFileToS3 (data, key) {
     return s3.upload({ Bucket: bucketName, Key: key, Body: data}).promise();
 }
 
-module.exports = {uploadToS3, downloadFromS3};
+// Function to upload the parsed file to the s3 bucket
+async function deleteObjectS3 (key) {
+    return s3.deleteS3Key({ Bucket: bucketName, Key: key }).promise();
+}
+
+module.exports = {uploadToS3, downloadFromS3, deleteObjectS3};
