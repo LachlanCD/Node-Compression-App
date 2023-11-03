@@ -11,6 +11,8 @@ const upload = multer({ storage: storage });
 
 // Handle file upload and compression
 router.post("/", upload.array("files"), async (req, res, next) => {
+  req.setTimeout(600000);
+
   try {
     if (!req.files || req.files.length === 0) throw { status: 400, message: "No files uploaded" };
     const compressedFiles = await Promise.all(
