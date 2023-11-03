@@ -13,7 +13,18 @@ const upload = multer({ storage: storage });
 router.post("/", upload.array("files"), async (req, res, next) => {
   try {
     if (!req.files || req.files.length === 0) throw { status: 400, message: "No files uploaded" };
-    const compressedFiles = await uploadFiles(req.files);
+    const compressedFiles = await Promise.all(
+      req.files.map(async (file) => {
+
+        const compressedBuffer = await compressWithXz(file.buffer);
+        const s3Key = `${file.originalname}.xz`;
+        await uploadToS3(compressedBuffer, s3Key);
+
+        await makeNewKeyPairRedis(file.originalname, s3Key, file.mimetype)
+
+        return s3Key;
+      })
+    );
 
     // Return a response to the client with the list of S3 keys for the compressed files
     res.status(200).json({ message: "Files compressed and uploaded to S3", compressedFiles });
@@ -21,26 +32,6 @@ router.post("/", upload.array("files"), async (req, res, next) => {
     next(err)
   }
 });
-
-async function uploadFiles(files) {
-  const compressedFiles = files.map(async (file) => {
-
-    console.log(file);
-
-    const compressedBuffer = await compressWithXz(file.buffer);
-    const s3Key = `${file.originalname}.xz`;
-    await uploadToS3(compressedBuffer, s3Key);
-
-    await makeNewKeyPairRedis(file.originalname, s3Key, file.mimetype)
-
-    return s3Key;
-  });
-
-  console.log('run');
-
-  return compressedFiles;
-}
-
 
 // Function to compress a buffer using Bzip2
 async function compressWithXz(inputBuffer) {
