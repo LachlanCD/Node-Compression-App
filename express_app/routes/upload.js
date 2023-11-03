@@ -23,7 +23,7 @@ router.post("/", upload.array("files"), async (req, res, next) => {
 });
 
 async function uploadFiles(files) {
-  const compressedFiles = await files.map(async (file) => {
+  const compressedFiles = files.map(async (file) => {
 
     console.log(file);
 
@@ -35,6 +35,8 @@ async function uploadFiles(files) {
 
     return s3Key;
   });
+
+  console.log('run');
 
   return compressedFiles;
 }
