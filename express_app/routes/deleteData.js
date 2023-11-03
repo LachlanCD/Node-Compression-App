@@ -1,10 +1,10 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 const { deleteObjectS3 } = require("../AWSFunctions/s3Functions");
 const { getKeyDataRedis, deleteKeyRedis } = require("../AWSFunctions/redisFunctions");
 
 // Handle file removal
-router.get('/:key', async (req, res, next) => {
+router.get("/:key", async (req, res, next) => {
   const key = req.params.key;
 
   try {
@@ -20,5 +20,5 @@ router.get('/:key', async (req, res, next) => {
     next(err)
   }
 });
-  
+
 module.exports = router;
