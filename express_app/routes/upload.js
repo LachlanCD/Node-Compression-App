@@ -23,7 +23,7 @@ router.post("/", upload.array("files"), async (req, res, next) => {
 });
 
 async function uploadFiles(files) {
-  files.map(async (file) => {
+  const compressedFiles = files.map(async (file) => {
 
     const compressedBuffer = await compressWithXz(file.buffer);
     const s3Key = `${file.originalname}.xz`;
@@ -32,7 +32,9 @@ async function uploadFiles(files) {
     await makeNewKeyPairRedis(file.originalname, s3Key, file.mimetype)
 
     return s3Key;
-  })
+  });
+
+  return compressedFiles;
 }
 
 
