@@ -25,6 +25,8 @@ router.post("/", upload.array("files"), async (req, res, next) => {
 async function uploadFiles(files) {
   const compressedFiles = await files.map(async (file) => {
 
+    console.log(file);
+
     const compressedBuffer = await compressWithXz(file.buffer);
     const s3Key = `${file.originalname}.xz`;
     await uploadToS3(compressedBuffer, s3Key);
