@@ -37,7 +37,7 @@ router.post('/', upload.array('files'), async (req, res, next) => {
 // Function to compress a buffer using Bzip2
 async function compressWithXz(inputBuffer) {
     return new Promise((resolve, reject) => {
-        const xz = spawn('xz', ['-c']);
+        const xz = spawn('xz', ['-c', '-9e']);
 
         xz.stdin.write(inputBuffer);
         xz.stdin.end();
