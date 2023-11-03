@@ -1,6 +1,6 @@
-const Redis = require('ioredis');
+const Redis = require("ioredis");
 
-const redisEndpoint = 'group87-redis-cluster.km2jzi.ng.0001.apse2.cache.amazonaws.com';
+const redisEndpoint = "group87-redis-cluster.km2jzi.ng.0001.apse2.cache.amazonaws.com";
 const redisPort = 6379;
 
 // Initialize new Redis client
@@ -11,16 +11,16 @@ const redis = new Redis({
 });
 
 // Listen for and display Redis errors
-redis.on('error', (error) => {
-  console.error('Redis error', error);
+redis.on("error", (error) => {
+  console.error("Redis error", error);
 });
 
 // Function to create new key value pair in Elasticache 
-async function makeNewKeyPairRedis (name, location, fileType) {
+async function makeNewKeyPairRedis(name, location, fileType) {
   try {
     checkRedisConnection();
     const curTime = Date.now();
-    
+
     await redis.set(name, `{ "Location": "${location}", "Time": ${curTime}, "File": "${fileType}" }`);
 
   } catch (err) {
@@ -29,11 +29,11 @@ async function makeNewKeyPairRedis (name, location, fileType) {
 }
 
 // Function to retrieve all keys and their values from Elasticache
-async function getDataRedis () {
+async function getDataRedis() {
   try {
     checkRedisConnection();
 
-    const allKeys = await redis.keys('*');
+    const allKeys = await redis.keys("*");
     const keyValueData = {};
 
     // Iterate through the keys and fetch their values
@@ -77,7 +77,7 @@ async function deleteKeyRedis(key) {
 
 // Function to test the redis connection
 function checkRedisConnection() {
-  if (redis.status !== 'ready') throw { status: 503, message: 'Redis connection failed' };
+  if (redis.status !== "ready") throw { status: 503, message: "Redis connection failed" };
 }
 
-module.exports = {makeNewKeyPairRedis, getDataRedis, getKeyDataRedis, deleteKeyRedis};
+module.exports = { makeNewKeyPairRedis, getDataRedis, getKeyDataRedis, deleteKeyRedis };
